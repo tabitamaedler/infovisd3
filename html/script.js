@@ -9,16 +9,16 @@ var margin = {top: 20, right: 20, bottom: 30, left: 40},
 var xValue = function(d) { return d["Horsepower(HP)"];}, // data -> value
     xScale = d3.scaleLinear().range([0, width]), // value -> display
     xMap = function(d) { return xScale(xValue(d));}, // data -> display
-    xAxis = d3.axisBottom(xScale); //svg.axis().scale(xScale).orient("bottom");
+    xAxis = d3.axisBottom().scale(xScale); //svg.axis().scale(xScale).orient("bottom");
 
 // setup y
 var yValue = function(d) { return d["Retail Price"];}, // data -> value
     yScale = d3.scaleLinear().range([height, 0]), // value -> display
     yMap = function(d) { return yScale(yValue(d));}, // data -> display
-    yAxis = d3.axisLeft(yScale);  //svg.axis().scale(yScale).orient("left");
+    yAxis = d3.axisLeft().scale(yScale);  //svg.axis().scale(yScale).orient("left");
 
 // setup fill color
-var cValue = function(d) { return d.Manufacturer;},
+var cValue = function(d) { return d.Type;},
     color = d3.scaleOrdinal(d3.schemeCategory10);
 
 // add the graph canvas to the body of the webpage
@@ -36,19 +36,14 @@ var tooltip = d3.select("body").append("div")
 
 
 
-
-
 // load data
 //d3.csv("cars.csv", function(error, data) {
 
 
-d3.text('cars.csv', function(error, raw){
-	var dsv = d3.dsvFormat(',')
-	var data = dsv.parse(raw)
-
+d3.csv('cars.csv').then(function(data) {
 
   // change string (from CSV) into number format
-  data.nodes().forEach(function(d) {
+  data.forEach(function(d) {
     d["Horsepower(HP)"] = +d["Horsepower(HP)"];
     d["Retail Price"] = +d["Retail Price"];
 //    console.log(d);
@@ -68,7 +63,7 @@ d3.text('cars.csv', function(error, raw){
       .attr("x", width)
       .attr("y", -6)
       .style("text-anchor", "end")
-      .text("HP");
+      .text("Horsepower(HP)");
 
   // y-axis
   svg.append("g")
@@ -80,9 +75,9 @@ d3.text('cars.csv', function(error, raw){
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Price");
+      .text("Retail Price");
 
-  // draw dots
+ // draw dots
   svg.selectAll(".dot")
       .data(data)
     .enter().append("circle")
@@ -95,7 +90,7 @@ d3.text('cars.csv', function(error, raw){
           tooltip.transition()
                .duration(200)
                .style("opacity", .9);
-          tooltip.html(d["Cereal Name"] + "<br/> (" + xValue(d) 
+          tooltip.html(d["Name"] + "<br/> (" + xValue(d) 
 	        + ", " + yValue(d) + ")")
                .style("left", (d3.event.pageX + 5) + "px")
                .style("top", (d3.event.pageY - 28) + "px");
