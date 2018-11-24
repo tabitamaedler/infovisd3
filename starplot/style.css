@@ -25,10 +25,14 @@ text {
 }
 
 path {
-   stroke:red;
+   stroke:#555;
    stroke-width:2;
    fill:blue;
    fill-opacity:0.4;
+}
+
+.cvalue {
+  fill:#555;
 }
 
 line {
