@@ -42,11 +42,47 @@ text {
   vertical-align: top;
 }
 
+#out_select {
+  color:#eedc00;
+}
+
+#out_hover {
+  color:#fff;
+}
+
+#out_hover, #out_select {
+  width: 500px;
+  display: inline-block;
+}
+
+.selecteddata.datapoint, .selecteddata.hovereddata.datapoint {
+  stroke: #eedc00 !important;
+  fill: #eedc00 !important;
+}
+
+.selecteddata.dataline, .selecteddata.hovereddata.dataline {
+  stroke: #eedc00 !important;
+  stroke-width: 5px;
+}
+
+
+.hovereddata.datapoint {
+  stroke: #fff !important;
+  fill: #fff !important;
+} 
+
+.hovereddata.dataline {
+  stroke: #fff !important;
+  stroke-width: 5px;
+}
+
+
+
 /* Parallel Coordinates */
 
 .background path {
   fill: none;
-  stroke: #fff;
+  stroke: #bbb;
   shape-rendering: crispEdges;
 }
 
@@ -91,5 +127,5 @@ line.starline {
 }
 
 .selecteddot {
-  fill:#fff !important;
+  fill:#9999ee!important;
 }

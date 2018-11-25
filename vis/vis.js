@@ -14,6 +14,23 @@
   var car = 0;
   var oldselpoint = document.createElement("div");
 
+
+function selectdataobj(name, clearname){
+    d3.selectAll(".selecteddata").classed('selecteddata', false);
+    d3.selectAll("."+name).classed('selecteddata', true);
+    console.log(name);
+
+    d3.select("#out_select").html(clearname);
+}
+
+function hoverdataobj(name, clearname){
+    d3.selectAll(".hovereddata").classed('hovereddata', false);
+    d3.selectAll("."+name).classed('hovereddata', true);
+    console.log(name);
+
+    d3.select("#out_hover").html(clearname);
+}
+
 // select car and draw star plot
 function clickanddraw(selcar,selpoint){
   oldselpoint.classList.remove("selecteddot");
@@ -27,13 +44,24 @@ function clickanddraw(selcar,selpoint){
 }
 
 
+function classfromname(str){
+  var newstr;
+  newstr = str.split(' ').join('_');
+  newstr = newstr.split('.').join('_');
+  newstr = newstr.split('(').join('_');
+  newstr = newstr.split(')').join('_');
+  newstr = newstr.split('/').join('_');
+  return newstr;
+}
+
+
 // -------------------------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------- P A R A L L E L  C O O R D I N A T E S -------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 var margin = {top: 30, right: 10, bottom: 10, left: 10},
-    width = 1250 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = 1450 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
 
 var x = d3.scale.ordinal().rangePoints([0, width], 1),
     y = {},
@@ -51,6 +79,11 @@ var svg = d3.select("#paralleldiv").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+
+
+var carname;
+var carstr;
+
 d3.csv("cars.csv", function(error, cars) {
   
   // Extract the list of dimensions and create a scale for each.
@@ -66,6 +99,12 @@ d3.csv("cars.csv", function(error, cars) {
   };
   }));
 
+  cars.forEach(function(d) {
+    d["id"] = i++;
+  });
+
+  console.log(cars[2]["Name"]);
+
   // Add grey background lines for context.
   background = svg.append("g")
       .attr("class", "background")
@@ -80,7 +119,22 @@ d3.csv("cars.csv", function(error, cars) {
     .selectAll("path")
       .data(cars)
     .enter().append("path")
-      .attr("d", path);
+      .attr("d", path)
+      .attr("class",function(d) {
+        carstr = classfromname(d["Name"]);
+        return carstr+" dataline";
+      })
+      .on("mouseover", function(d) {
+          carstr = classfromname(d["Name"]);
+          hoverdataobj(carstr, d["Name"]);
+      })
+      .on("mouseout", function(d) {
+      })
+      .on("click", function(d) {
+          //clickanddraw(d["id"], this);
+          carstr = classfromname(d["Name"]);
+          selectdataobj(carstr, d["Name"]);
+      }); 
 
   // Add a group element for each dimension.
   var g = svg.selectAll(".dimension")
@@ -131,7 +185,8 @@ d3.csv("cars.csv", function(error, cars) {
     .selectAll("rect")
       .attr("x", -8)
       .attr("width", 16);
-});
+
+}); // end cvs
 
 function position(d) {
   var v = dragging[d];
@@ -171,8 +226,8 @@ function brush() {
 
 
 var margin2 = {top: 20, right: 20, bottom: 30, left: 40},
-    width2 = 1000,
-    height2 = 500;
+    width2 = 1000 - margin2.left - margin2.right,
+    height2 = 550 - margin2.top - margin2.bottom;
 
 
 // setup x 
@@ -200,14 +255,12 @@ var svg2 = d3.select("#scatterplotdiv").append("svg")
 
 var svgled = d3.select("#legend").append("svg")
     .attr("width", "500")
-    .attr("height", "100");
+    .attr("height", "30");
 
 // add the tooltip area to the webpage
 var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
-
-
 
 
 // load data
@@ -255,7 +308,11 @@ d3.csv("cars.csv", function(error, data) {
   svg2.selectAll(".dot")
       .data(data)
     .enter().append("circle")
-      .attr("class", "dot")
+      .attr("class",function(d) {
+        carname = d["Name"];
+        carstr = carname.split(' ').join('_');
+        return carstr+" datapoint"+" dot";
+      })
       .attr("r", 3.5)
       .attr("cx", xMap)
       .attr("cy", yMap)
@@ -337,7 +394,7 @@ var margin3 = {top: 20, right: 20, bottom: 30, left: 40},
 var svg3 = d3.select("#starplotdiv").append("svg")
     .attr("width", 550)
     .attr("height", 550)
-    .attr("viewBox","-"+coossize+" -"+coossize+" "+(coossize*2)+" "+(coossize*2));
+    .attr("viewBox","-"+coossize+" -"+coossize+" "+(coossize*2+20)+" "+(coossize*2));
 
 // add the tooltip area to the webpage
 var tooltip = d3.select("body").append("div")
