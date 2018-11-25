@@ -37,6 +37,8 @@ text {
 	fill:black;
 }
 
+/* ---------------------------------------------  Global ---------------------------------------------  */
+
 .wrapp {
   display: inline-block;
   vertical-align: top;
@@ -78,7 +80,7 @@ text {
 
 
 
-/* Parallel Coordinates */
+/* ---------------------------------------------  Parallel Coordinates  ---------------------------------------------  */
 
 .background path {
   fill: none;
@@ -109,11 +111,11 @@ text {
   cursor: move;
 }
 
-/* Starplot */
+/* --------------------------------------------- Starplot ----------------------------------------------- */
 path.starpath {
    stroke:#555;
    stroke-width:2;
-   fill:#9999ee;
+   fill: #eedc00;
    opacity: 0.7;
 }
 
@@ -124,8 +126,4 @@ path.starpath {
 line.starline {
   stroke:black;
   stroke-width:1;
-}
-
-.selecteddot {
-  fill:#9999ee!important;
 }

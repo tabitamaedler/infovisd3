@@ -14,6 +14,9 @@
   var car = 0;
   var oldselpoint = document.createElement("div");
 
+  var carname;
+  var carstr;
+
 
 function selectdataobj(name, clearname){
     d3.selectAll(".selecteddata").classed('selecteddata', false);
@@ -32,15 +35,12 @@ function hoverdataobj(name, clearname){
 }
 
 // select car and draw star plot
-function clickanddraw(selcar,selpoint){
-  oldselpoint.classList.remove("selecteddot");
+function drawnewstarplot(selcar){
   car = selcar;
   console.log("Car: "+selcar);
   
   d3.select("#stargroup").remove();
   drawstarplot();
-  selpoint.classList.add("selecteddot");
-  oldselpoint = selpoint;
 }
 
 
@@ -79,11 +79,6 @@ var svg = d3.select("#paralleldiv").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
-
-var carname;
-var carstr;
-
 d3.csv("cars.csv", function(error, cars) {
   
   // Extract the list of dimensions and create a scale for each.
@@ -99,11 +94,13 @@ d3.csv("cars.csv", function(error, cars) {
   };
   }));
 
+  var i=0;
   cars.forEach(function(d) {
     d["id"] = i++;
+    console.log(d["id"]);
   });
 
-  console.log(cars[2]["Name"]);
+  
 
   // Add grey background lines for context.
   background = svg.append("g")
@@ -134,6 +131,7 @@ d3.csv("cars.csv", function(error, cars) {
           //clickanddraw(d["id"], this);
           carstr = classfromname(d["Name"]);
           selectdataobj(carstr, d["Name"]);
+          drawnewstarplot(d["id"]);
       }); 
 
   // Add a group element for each dimension.
@@ -244,7 +242,7 @@ var yValue = function(d) { return d["Retail Price"];}, // data -> value
 
 // setup fill color
 var cValue = function(d) { return d.Type;},
-    color = d3.scale.category10(); //color = d3.scaleOrdinal(d3.schemeCategory10);
+    color = d3.scale.ordinal().range(["#ef6f6c", "#9b7ede" ,"#832161","#c0c999","#76e7cd"]);//category10(); //color = d3.scaleOrdinal(d3.schemeCategory10);
 
 // add the graph canvas to the body of the webpage
 var svg2 = d3.select("#scatterplotdiv").append("svg")
@@ -325,16 +323,21 @@ d3.csv("cars.csv", function(error, data) {
 	        + ", " + yValue(d) + ")")
                .style("left", (d3.event.pageX + 5) + "px")
                .style("top", (d3.event.pageY - 28) + "px");
-               this.style.stroke = "#bbb";
+
+          //hightlight 
+          carstr = classfromname(d["Name"]);
+          hoverdataobj(carstr, d["Name"]);
+
       })
       .on("mouseout", function(d) {
           tooltip.transition()
                .duration(500)
                .style("opacity", 0);
-          this.style.stroke = "#444";
       })
       .on("click", function(d) {
-          clickanddraw(d["id"], this);
+          drawnewstarplot(d["id"]);
+          carstr = classfromname(d["Name"]);
+          selectdataobj(carstr, d["Name"]);
       });
 
   // draw legend
@@ -525,6 +528,8 @@ for (i = 0; i < axises.length; i++) {
 function drawstarplot() {
 //d3.csv('cars.csv').then(function(data) {
 d3.csv("cars.csv", function(error, data) {
+
+  console.log("Starplot: "+data[car]["Name"]);
 
   // initaliate variables
   var nex = 0, // new x coordinate
