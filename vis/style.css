@@ -3,6 +3,21 @@ body {
   background-color: #333;
 }
 
+h3 {
+  color: #bbb;
+}
+
+.container {
+  display: flex;
+}
+.side {
+  vertical-align: top;
+}
+
+#vis {
+  width: 1600px;
+}
+
 #scatterplotdiv svg, #starplotdiv svg, #paralleldiv svg {
  background-color: #ddd;
 }
@@ -115,8 +130,19 @@ text {
 path.starpath {
    stroke:#555;
    stroke-width:2;
+   fill: #fff;
+   opacity: 0.2;
+}
+
+#stargroup_select path.starpath {
+   stroke:#555;
+   stroke-width:2;
    fill: #eedc00;
-   opacity: 0.7;
+   opacity: 0.6;
+}
+
+#stargroup_select .cirvalue {
+    fill:#555;
 }
 
 .cirvalue {
@@ -126,4 +152,8 @@ path.starpath {
 line.starline {
   stroke:black;
   stroke-width:1;
+}
+
+#starplotdiv .label {
+  font-size:25px ;
 }

@@ -1,5 +1,5 @@
 // Assigment 2
-// by Tabita Mädler and Paul Ridel
+// by Tabita Mädler and Paul Riedel
 
 // Scatterplot - mostly from http://bl.ocks.org/weiglemc/6185069
 // Starplot - mostly self written
@@ -11,7 +11,7 @@
 // Variables
 
 // choose car 
-  var car = 0;
+  var car_x = 0;
   var oldselpoint = document.createElement("div");
 
   var carname;
@@ -21,7 +21,7 @@
 function selectdataobj(name, clearname){
     d3.selectAll(".selecteddata").classed('selecteddata', false);
     d3.selectAll("."+name).classed('selecteddata', true);
-    console.log(name);
+    //console.log(name);
 
     d3.select("#out_select").html(clearname);
 }
@@ -29,18 +29,15 @@ function selectdataobj(name, clearname){
 function hoverdataobj(name, clearname){
     d3.selectAll(".hovereddata").classed('hovereddata', false);
     d3.selectAll("."+name).classed('hovereddata', true);
-    console.log(name);
 
     d3.select("#out_hover").html(clearname);
 }
 
 // select car and draw star plot
-function drawnewstarplot(selcar){
-  car = selcar;
-  console.log("Car: "+selcar);
-  
-  d3.select("#stargroup").remove();
-  drawstarplot();
+function drawnewstarplot(car,starmode){
+  d3.selectAll("#stargroup_"+starmode).remove();
+
+  drawstarplot(car,starmode);
 }
 
 
@@ -60,8 +57,8 @@ function classfromname(str){
 // -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 var margin = {top: 30, right: 10, bottom: 10, left: 10},
-    width = 1450 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+    width = 1550 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
 
 var x = d3.scale.ordinal().rangePoints([0, width], 1),
     y = {},
@@ -97,7 +94,6 @@ d3.csv("cars.csv", function(error, cars) {
   var i=0;
   cars.forEach(function(d) {
     d["id"] = i++;
-    console.log(d["id"]);
   });
 
   
@@ -124,6 +120,7 @@ d3.csv("cars.csv", function(error, cars) {
       .on("mouseover", function(d) {
           carstr = classfromname(d["Name"]);
           hoverdataobj(carstr, d["Name"]);
+          drawnewstarplot(d["id"],"hovered");
       })
       .on("mouseout", function(d) {
       })
@@ -131,7 +128,7 @@ d3.csv("cars.csv", function(error, cars) {
           //clickanddraw(d["id"], this);
           carstr = classfromname(d["Name"]);
           selectdataobj(carstr, d["Name"]);
-          drawnewstarplot(d["id"]);
+          drawnewstarplot(d["id"],"select");
       }); 
 
   // Add a group element for each dimension.
@@ -229,7 +226,7 @@ var margin2 = {top: 20, right: 20, bottom: 30, left: 40},
 
 
 // setup x 
-var xValue = function(d) { return d["Horsepower(HP)"];}, // data -> value
+var xValue = function(d) { return d["Weight"];}, // data -> value
     xScale = d3.scale.linear().range([0, width2]), // value -> display
     xMap = function(d) { return xScale(xValue(d));}, // data -> display
     xAxis = d3.svg.axis().scale(xScale).orient("bottom"); //d3.axisBottom().scale(xScale); 
@@ -239,6 +236,11 @@ var yValue = function(d) { return d["Retail Price"];}, // data -> value
     yScale = d3.scale.linear().range([height2, 0]), // value -> display
     yMap = function(d) { return yScale(yValue(d));}, // data -> display
     yAxis = d3.svg.axis().scale(yScale).orient("left"); // d3.axisLeft().scale(yScale);  
+
+// setup s
+var sValue = function(d) { return d["Horsepower(HP)"];}, // data -> value
+    sScale = d3.scale.linear().range([3.5,15]), // value -> display
+    sMap = function(d) { return sScale(sValue(d));}; // d3.axisLeft().scale(yScale); 
 
 // setup fill color
 var cValue = function(d) { return d.Type;},
@@ -252,7 +254,7 @@ var svg2 = d3.select("#scatterplotdiv").append("svg")
     .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
 var svgled = d3.select("#legend").append("svg")
-    .attr("width", "500")
+    .attr("width", width2 + margin2.left + margin2.right)
     .attr("height", "30");
 
 // add the tooltip area to the webpage
@@ -270,6 +272,7 @@ d3.csv("cars.csv", function(error, data) {
   data.forEach(function(d) {
     d["Horsepower(HP)"] = +d["Horsepower(HP)"];
     d["Retail Price"] = +d["Retail Price"];
+    d["Weight"] = +d["Weight"];
     d["id"] = i++;
 //    console.log(d);
   });
@@ -277,6 +280,8 @@ d3.csv("cars.csv", function(error, data) {
   // don't want dots overlapping axis, so add in buffer to data domain
   xScale.domain([d3.min(data, xValue)-1, d3.max(data, xValue)+1]);
   yScale.domain([d3.min(data, yValue)-1, d3.max(data, yValue)+1]);
+  sScale.domain([d3.min(data, sValue)-1, d3.max(data, sValue)+1]);
+
 
   // x-axis
   svg2.append("g")
@@ -288,7 +293,7 @@ d3.csv("cars.csv", function(error, data) {
       .attr("x", width2)
       .attr("y", -6)
       .style("text-anchor", "end")
-      .text("Horsepower(HP)");
+      .text("Weight");
 
   // y-axis
   svg2.append("g")
@@ -311,7 +316,7 @@ d3.csv("cars.csv", function(error, data) {
         carstr = carname.split(' ').join('_');
         return carstr+" datapoint"+" dot";
       })
-      .attr("r", 3.5)
+      .attr("r", sMap)
       .attr("cx", xMap)
       .attr("cy", yMap)
       .style("fill", function(d) { return color(cValue(d));}) 
@@ -320,14 +325,14 @@ d3.csv("cars.csv", function(error, data) {
                .duration(200)
                .style("opacity", .9);
           tooltip.html(d["Name"] + "<br/> (" + xValue(d) 
-	        + ", " + yValue(d) + ")")
+	        + ", " + yValue(d) + ", " + sValue(d) + ")")
                .style("left", (d3.event.pageX + 5) + "px")
                .style("top", (d3.event.pageY - 28) + "px");
 
           //hightlight 
           carstr = classfromname(d["Name"]);
           hoverdataobj(carstr, d["Name"]);
-
+          drawnewstarplot(d["id"],"hovered");
       })
       .on("mouseout", function(d) {
           tooltip.transition()
@@ -335,7 +340,7 @@ d3.csv("cars.csv", function(error, data) {
                .style("opacity", 0);
       })
       .on("click", function(d) {
-          drawnewstarplot(d["id"]);
+          drawnewstarplot(d["id"],"select");
           carstr = classfromname(d["Name"]);
           selectdataobj(carstr, d["Name"]);
       });
@@ -360,12 +365,52 @@ d3.csv("cars.csv", function(error, data) {
       .attr("y", 9)
       .attr("dy", ".35em")
       .style("text-anchor", "start")
-      .text(function(d) { return d;})
+      .text(function(d) { return d;});
+
+
+  console.log("Min: "+d3.min(data, sValue)+" | Max:"+d3.max(data, sValue));
+  console.log("Min: "+d3.min(data, sMap)+" | Max:"+d3.max(data, sMap));
+
+// draw legend text
+  svgled.append("text")
+        .attr("x", 600)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "start")
+        .text("Size = Horsepower(HP)")
+
+  svgled.append("circle")
+        .attr("r", d3.min(data, sMap))
+        .attr("cx", 760)
+        .attr("cy", 15)
+        .attr("fill", "#ddd")
+        .attr("stroke", "#888");
+
+  svgled.append("text")
+        .attr("x", 770)
+        .attr("y", 15)
+        .attr("dy", ".35em")
+        .style("text-anchor", "start")
+        .text(d3.min(data, sValue))
+
+  svgled.append("circle")
+        .attr("r", d3.max(data, sMap))
+        .attr("cx", 820)
+        .attr("cy", 15)
+        .attr("fill", "#ddd")
+        .attr("stroke", "#888");
+
+  svgled.append("text")
+        .attr("x", 840)
+        .attr("y", 15)
+        .attr("dy", ".35em")
+        .style("text-anchor", "start")
+        .text(d3.max(data, sValue))
+
 });
 
 
-
-
+  
 
 
 
@@ -525,7 +570,9 @@ for (i = 0; i < axises.length; i++) {
 
 // ################################### DYNAMIC DATA  ###################################
 
-function drawstarplot() {
+function drawstarplot(param,mode) {
+
+var car = param;
 //d3.csv('cars.csv').then(function(data) {
 d3.csv("cars.csv", function(error, data) {
 
@@ -588,7 +635,7 @@ d3.csv("cars.csv", function(error, data) {
 
 
  var star = svg3.append("g")
-        .attr("id", "stargroup");
+        .attr("id", "stargroup_"+mode);
 
   //draw line
   star.append("path")
@@ -603,7 +650,7 @@ d3.csv("cars.csv", function(error, data) {
 
   // Axis 1 (top)
   star.append("circle")
-    .attr("class", "cvalue")
+    .attr("class", "cirvalue")
     .attr("cx", 0)
     .attr("cy","-"+oMap(data[car]))
     .attr("r", 5)
