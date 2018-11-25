@@ -3,8 +3,16 @@ body {
   background-color: #333;
 }
 
-svg  {
+#scatterplotdiv svg, #starplotdiv svg, #paralleldiv svg {
  background-color: #ddd;
+}
+
+#legend svg {
+   background-color: none;
+}
+
+#legend svg text {
+  fill: #fff;
 }
 
 .axis path,
@@ -29,8 +37,40 @@ text {
 	fill:black;
 }
 
-#starplotdiv, #scatterplotdiv {
+.wrapp {
   display: inline-block;
+  vertical-align: top;
+}
+
+/* Parallel Coordinates */
+
+.background path {
+  fill: none;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.foreground path {
+  fill: none;
+  stroke: #665ec7;
+}
+
+.brush .extent {
+  fill-opacity: .3;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.axis line,
+.axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+  cursor: move;
 }
 
 /* Starplot */

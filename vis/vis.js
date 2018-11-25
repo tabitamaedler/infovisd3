@@ -27,6 +27,141 @@ function clickanddraw(selcar,selpoint){
 }
 
 
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------- P A R A L L E L  C O O R D I N A T E S -------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+var margin = {top: 30, right: 10, bottom: 10, left: 10},
+    width = 1250 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.ordinal().rangePoints([0, width], 1),
+    y = {},
+  d = {},
+    dragging = {};
+
+var line = d3.svg.line(),
+    axis = d3.svg.axis().orient("left"),
+    background,
+    foreground;
+
+var svg = d3.select("#paralleldiv").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.csv("cars.csv", function(error, cars) {
+  
+  // Extract the list of dimensions and create a scale for each.
+  x.domain(dimensions = d3.keys(cars[0]).filter(function(d) {
+  switch(d){
+  case "Name":break;
+  case "Type":break;
+  //case "AWD":break;
+  //case "RWD":break;
+  default: return d && (y[d] = d3.scale.linear()
+        .domain(d3.extent(cars, function(p) { return +p[d]; }))
+        .range([height,0]));
+  };
+  }));
+
+  // Add grey background lines for context.
+  background = svg.append("g")
+      .attr("class", "background")
+    .selectAll("path")
+      .data(cars)
+    .enter().append("path")
+      .attr("d", path);
+
+  // Add blue foreground lines for focus.
+  foreground = svg.append("g")
+      .attr("class", "foreground")
+    .selectAll("path")
+      .data(cars)
+    .enter().append("path")
+      .attr("d", path);
+
+  // Add a group element for each dimension.
+  var g = svg.selectAll(".dimension")
+      .data(dimensions)
+    .enter().append("g")
+      .attr("class", "dimension")
+      .attr("transform", function(d) { return "translate(" + x(d) + ")"; })
+      .call(d3.behavior.drag()
+        .origin(function(d) { return {x: x(d)}; })
+        .on("dragstart", function(d) {
+          dragging[d] = x(d);
+          background.attr("visibility", "hidden");
+        })
+        .on("drag", function(d) {
+          dragging[d] = Math.min(width, Math.max(0, d3.event.x));
+          foreground.attr("d", path);
+          dimensions.sort(function(a, b) { return position(a) - position(b); });
+          x.domain(dimensions);
+          g.attr("transform", function(d) { return "translate(" + position(d) + ")"; })
+        })
+        .on("dragend", function(d) {
+          delete dragging[d];
+          transition(d3.select(this)).attr("transform", "translate(" + x(d) + ")");
+          transition(foreground).attr("d", path);
+          background
+              .attr("d", path)
+            .transition()
+              .delay(500)
+              .duration(0)
+              .attr("visibility", null);
+        }));
+
+  // Add an axis and title.
+  g.append("g")
+      .attr("class", "axis")
+      .each(function(d) { d3.select(this).call(axis.scale(y[d])); })
+    .append("text")
+      .style("text-anchor", "middle")
+      .attr("y", -9)
+      .text(function(d) { return d; });
+
+  // Add and store a brush for each axis.
+  g.append("g")
+      .attr("class", "brush")
+      .each(function(d) {
+        d3.select(this).call(y[d].brush = d3.svg.brush().y(y[d]).on("brushstart", brushstart).on("brush", brush));
+      })
+    .selectAll("rect")
+      .attr("x", -8)
+      .attr("width", 16);
+});
+
+function position(d) {
+  var v = dragging[d];
+  return v == null ? x(d) : v;
+}
+
+function transition(g) {
+  return g.transition().duration(500);
+}
+
+// Returns the path for a given data point.
+function path(d) {
+  return line(dimensions.map(function(p) { return [position(p), y[p](d[p])]; }));
+}
+
+function brushstart() {
+  d3.event.sourceEvent.stopPropagation();
+}
+
+// Handles a brush event, toggling the display of foreground lines.
+function brush() {
+  var actives = dimensions.filter(function(p) { return !y[p].brush.empty(); }),
+      extents = actives.map(function(p) { return y[p].brush.extent(); });
+  foreground.style("display", function(d) {
+    return actives.every(function(p, i) {
+      return extents[i][0] <= d[p] && d[p] <= extents[i][1];
+    }) ? null : "none";
+  });
+}
+
 
 
 // -------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -35,33 +170,37 @@ function clickanddraw(selcar,selpoint){
 
 
 
-var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 1000,
-    height = 500;
+var margin2 = {top: 20, right: 20, bottom: 30, left: 40},
+    width2 = 1000,
+    height2 = 500;
 
 
 // setup x 
 var xValue = function(d) { return d["Horsepower(HP)"];}, // data -> value
-    xScale = d3.scaleLinear().range([0, width]), // value -> display
+    xScale = d3.scale.linear().range([0, width2]), // value -> display
     xMap = function(d) { return xScale(xValue(d));}, // data -> display
-    xAxis = d3.axisBottom().scale(xScale); //svg2.axis().scale(xScale).orient("bottom");
+    xAxis = d3.svg.axis().scale(xScale).orient("bottom"); //d3.axisBottom().scale(xScale); 
 
 // setup y
 var yValue = function(d) { return d["Retail Price"];}, // data -> value
-    yScale = d3.scaleLinear().range([height, 0]), // value -> display
+    yScale = d3.scale.linear().range([height2, 0]), // value -> display
     yMap = function(d) { return yScale(yValue(d));}, // data -> display
-    yAxis = d3.axisLeft().scale(yScale);  //svg2.axis().scale(yScale).orient("left");
+    yAxis = d3.svg.axis().scale(yScale).orient("left"); // d3.axisLeft().scale(yScale);  
 
 // setup fill color
 var cValue = function(d) { return d.Type;},
-    color = d3.scaleOrdinal(d3.schemeCategory10);
+    color = d3.scale.category10(); //color = d3.scaleOrdinal(d3.schemeCategory10);
 
 // add the graph canvas to the body of the webpage
 var svg2 = d3.select("#scatterplotdiv").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("width", width2 + margin2.left + margin2.right)
+    .attr("height", height2 + margin2.top + margin2.bottom)
   .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+var svgled = d3.select("#legend").append("svg")
+    .attr("width", "500")
+    .attr("height", "100");
 
 // add the tooltip area to the webpage
 var tooltip = d3.select("body").append("div")
@@ -72,10 +211,8 @@ var tooltip = d3.select("body").append("div")
 
 
 // load data
-//d3.csv("cars.csv", function(error, data) {
-
-
-d3.csv('cars.csv').then(function(data) {
+d3.csv("cars.csv", function(error, data) {
+//d3.csv('cars.csv').then(function(data) {
 
   // change string (from CSV) into number format
   var i=0;
@@ -97,7 +234,7 @@ d3.csv('cars.csv').then(function(data) {
       .call(xAxis)
     .append("text")
       .attr("class", "label")
-      .attr("x", width)
+      .attr("x", width2)
       .attr("y", -6)
       .style("text-anchor", "end")
       .text("Horsepower(HP)");
@@ -144,25 +281,25 @@ d3.csv('cars.csv').then(function(data) {
       });
 
   // draw legend
-  var legend = svg2.selectAll(".legend")
+  var legend = svgled.selectAll(".legend")
       .data(color.domain())
     .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+      .attr("transform", function(d, i) { return "translate(" + i * 80 + ",0)"; });
 
   // draw legend colored rectangles
   legend.append("rect")
-      .attr("x", width - 18)
+      .attr("x", 18)
       .attr("width", 18)
       .attr("height", 18)
       .style("fill", color);
 
   // draw legend text
   legend.append("text")
-      .attr("x", width - 24)
+      .attr("x", 40)
       .attr("y", 9)
       .attr("dy", ".35em")
-      .style("text-anchor", "end")
+      .style("text-anchor", "start")
       .text(function(d) { return d;})
 });
 
@@ -185,15 +322,15 @@ d3.csv('cars.csv').then(function(data) {
 
 
 
-
 //------------------------ PRE-SETTINGS ------------------------
 // set domain length of axises
 var coossize = 500;
 
 // position
-var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = (coossize*2) - margin.left - margin.right,
-    height = (coossize*2) - margin.top - margin.bottom;
+var margin3 = {top: 20, right: 20, bottom: 30, left: 40},
+    width3 = (coossize*2) - margin3.left - margin3.right,
+    height3 = (coossize*2) - margin3.top - margin3.bottom;
+
 
 // add svg, set height and weight
 // viewbox makes (0,0) appear in the center
@@ -206,6 +343,7 @@ var svg3 = d3.select("#starplotdiv").append("svg")
 var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
+
 
 
 // ------------------------ STATIC DRAWING ------------------------
@@ -258,38 +396,38 @@ var axises = [mapaxis1,mapaxis2,mapaxis3,mapaxis4,mapaxis5,mapaxis6];
 
 // For all axises 
 var aValue = function(d,i) { return d[axises[i]];}; // data -> value
-   /* aScale = d3.scaleLinear().range([0, coossize]), // value -> display
-    aMap = function(d,i) { return aScale(aValue(d,i));}; // data -> display*/
+   //aScale = d3.scaleLinear().range([0, coossize]), // value -> display
+    //aMap = function(d,i) { return aScale(aValue(d,i));}; // data -> display
 
 
 // Axis 1
 var oValue = function(d) { return d[mapaxis1];}, // data -> value
-    oScale = d3.scaleLinear().range([0, coossize]), // value -> display
+    oScale = d3.scale.linear().range([0, coossize]), // value -> display
     oMap = function(d) { return oScale(oValue(d));}; // data -> display
 
 // Axis 2
 var roValue = function(d) { return d[mapaxis2];}, // data -> value
-    roScale = d3.scaleLinear().range([0, coossize]), // value -> display
+    roScale = d3.scale.linear().range([0, coossize]), // value -> display
     roMap = function(d) { return roScale(roValue(d));}; // data -> display
 
 // Axis 3
 var ruValue = function(d) { return d[mapaxis3];}, // data -> value
-    ruScale = d3.scaleLinear().range([0, coossize]), // value -> display
+    ruScale = d3.scale.linear().range([0, coossize]), // value -> display
     ruMap = function(d) { return ruScale(ruValue(d));}; // data -> display
 
 // Axis 4
 var uValue = function(d) { return d[mapaxis4];}, // data -> value
-    uScale = d3.scaleLinear().range([0, coossize]), // value -> display
+    uScale = d3.scale.linear().range([0, coossize]), // value -> display
     uMap = function(d) { return uScale(uValue(d));}; // data -> display
 
 // Axis 5
 var luValue = function(d) { return d[mapaxis5];}, // data -> value
-    luScale = d3.scaleLinear().range([0, coossize]), // value -> display
+    luScale = d3.scale.linear().range([0, coossize]), // value -> display
     luMap = function(d) { return luScale(luValue(d));}; // data -> display
 
 // Axis 6
 var loValue = function(d) { return d[mapaxis6];}, // data -> value
-    loScale = d3.scaleLinear().range([0, coossize]), // value -> display
+    loScale = d3.scale.linear().range([0, coossize]), // value -> display
     loMap = function(d) { return loScale(loValue(d));}; // data -> display
 
 
@@ -328,7 +466,8 @@ for (i = 0; i < axises.length; i++) {
 // ################################### DYNAMIC DATA  ###################################
 
 function drawstarplot() {
-d3.csv('cars.csv').then(function(data) {
+//d3.csv('cars.csv').then(function(data) {
+d3.csv("cars.csv", function(error, data) {
 
   // initaliate variables
   var nex = 0, // new x coordinate
@@ -463,4 +602,3 @@ d3.csv('cars.csv').then(function(data) {
 });
 
 };
-
