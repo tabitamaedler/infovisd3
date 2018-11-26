@@ -220,7 +220,7 @@ function brush() {
 
 
 
-var margin2 = {top: 20, right: 20, bottom: 30, left: 40},
+var margin2 = {top: 20, right: 20, bottom: 30, left: 50},
     width2 = 1000 - margin2.left - margin2.right,
     height2 = 550 - margin2.top - margin2.bottom;
 
@@ -492,8 +492,8 @@ svg3.append("line")
 var mapaxis1 = "Engine Size (l)",
     mapaxis2 = "Weight",
     mapaxis3 = "Width",
-    mapaxis4 = "Cyl",
-    mapaxis5 = "Wheel Base",
+    mapaxis4 = "Horsepower(HP)",
+    mapaxis5 = "Retail Price",
     mapaxis6 = "Len";
 
 var axises = [mapaxis1,mapaxis2,mapaxis3,mapaxis4,mapaxis5,mapaxis6];
