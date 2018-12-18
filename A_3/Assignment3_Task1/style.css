@@ -1,0 +1,59 @@
+/* General */
+
+body {
+  font: 11px sans-serif;
+  background-color: #333;
+  margin:0px;
+  padding:0px;
+}
+
+svg { position:fixed; top:0; left:0; height:100%; width:100% }
+
+h3 {
+  color: #bbb;
+}
+
+.container {
+  display: flex;
+}
+
+
+/* Treemap */
+
+.node {
+  /* fill: steelblue;*/
+  stroke: none;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1px;
+}
+
+line {
+	vector-effect: non-scaling-stroke;
+}
+
+
+/* Sunburst */
+
+
+        .slice {
+            cursor: pointer;
+        }
+
+        .slice .main-arc {
+            stroke: #fff;
+            stroke-width: 1px;
+        }
+
+        .slice .hidden-arc, .hidden-arc-inner, .hidden-arc-outer {
+            fill: none;
+        }
+
+        .slice text {
+            pointer-events: none;
+            dominant-baseline: middle;
+            text-anchor: middle;
+        }
