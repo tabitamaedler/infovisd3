@@ -14,7 +14,7 @@ body {
   border-right: 10px solid #555;
   }
 
-svg {
+.container svg {
   border-bottom: 10px solid #555;
 }
 
@@ -33,6 +33,11 @@ h3 {
 
 .container div{
   width: 50%
+}
+
+#legendiv {
+  padding: 20px;
+  display: flex;
 }
 
 

@@ -41,14 +41,13 @@ var hScale = d3.scaleLinear().range([250,350]);
 var sMap = function(d) { return sScale(sValue(d));};
 var hMap = function(d) { return hScale(sValue(d));};
 
+//domain color
+sScale.domain([0, 31806]);
+hScale.domain([0, 31806]);
 
 // retrieve Data
 d3.json("https://imld.de/docs/lehre/ws_18-19/data-vis/data/web-vis-tools.json", function(error, data) {
 
-
-//domain color
-sScale.domain([0, 31806]);
-hScale.domain([0, 31806]);
 
 //----------------------------------------------------- TREE -----------------------------------------------------//
 
@@ -255,8 +254,101 @@ function transform(t) {
 
 });
 
+//----------------------------------------------------- LEDGEND -----------------------------------------------------//
+
+var ledsvg = d3.select('#legendiv').append('svg')
+                .attr("width", "600px");
 
 
+ledsvg
+    .append('text')
+    .text('Free')
+    .attr("fill", "#000")
+    .style("font-size", "20px")
+    .attr("x", 40)
+    .attr("y", 20);
+
+
+ledsvg
+    .append('circle')
+    .attr('r',10)
+    .attr('cx',50)
+    .attr('cy',40);
+
+ledsvg
+    .append("rect")
+    .attr("width", 20)
+    .attr("height", 20)
+    .attr("x", 90)
+    .attr("y", 30);
+
+ledsvg
+    .append('text')
+    .text('-')
+    .attr("fill", "#000")
+    .style("font-size", "16px")
+    .attr("x", 50)
+    .attr("y", 70)
+    .attr("text-anchor", "middle");
+
+ledsvg
+    .append('text')
+    .text('true')
+    .attr("fill", "#000")
+    .style("font-size", "16px")
+    .attr("x",90)
+    .attr("y", 70)
+    .attr("text-anchor", "start");
+
+
+ledsvg
+    .append('text')
+    .text('Stackoverflow')
+    .attr("fill", "#000")
+    .style("font-size", "20px")
+    .attr("x", 220)
+    .attr("y", 20);
+
+ledsvg
+    .append("rect")
+    .attr("width", 20)
+    .attr("height", 20)
+    .attr("x", 220)
+    .attr("y", 30)
+    .attr("fill","#111");
+
+ ledsvg
+    .append('text')
+    .text('-')
+    .attr("fill", "#000")
+    .style("font-size", "16px")
+    .attr("x", 230)
+    .attr("y", 70)
+    .attr("text-anchor", "middle");
+
+var arrvalue = [0,1000,3000,10000,31806];
+var j;
+for (j = 0; j < 5; j++) {
+  ledsvg
+    .append("rect")
+    .attr("width", 20)
+    .attr("height", 20)
+    .attr("x", 260+45*j)
+    .attr("y", 30)
+    .attr("fill", function(d) {
+      return 'hsl(190, 100%, '+Math.round(sScale(arrvalue[j]))+'%)';
+    });
+
+  ledsvg
+    .append('text')
+    .text(arrvalue[j])
+    .attr("fill", "#000")
+    .style("font-size", "12px")
+    .attr("x", 270+45*j)
+    .attr("y", 70)
+    .attr("text-anchor", "middle");
+
+} 
 
 
 /* -------------------------------------------------------------
