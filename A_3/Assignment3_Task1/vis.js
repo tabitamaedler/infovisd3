@@ -231,7 +231,7 @@ function zoomed() {
   }
   // (ii) lable
   else {
-    text.attr("fill", "#000");
+    text.attr("fill", "#fff");
     text.style("font-size", "4px");
   }
 
@@ -343,9 +343,9 @@ function transform(t) {
         };
 
         const svg = d3.select('#sundiv').append('svg')
-            .style('width', '100vw')
-            .style('height', '50vh')
-            .attr('viewBox', `${-width / 2} ${-height / 2} ${width} ${height}`)
+            .style('width', '100%')
+            .style('height', '100%')
+            .attr('viewBox', '-600 -472 1200 900'/*`${-width / 2} ${-height / 2} ${width} ${height}`*/)
             .on('click', () => focusOn()); // Reset zoom on canvas click
 
         d3.json('https://imld.de/docs/lehre/ws_18-19/data-vis/data/web-vis-tools.json', (error, root) => {

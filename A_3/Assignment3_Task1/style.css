@@ -2,12 +2,24 @@
 
 body {
   font: 11px sans-serif;
-  background-color: #333;
+  background-color: #444;
   margin:0px;
   padding:0px;
 }
 
-svg { position:fixed; top:0; left:0; height:100%; width:100% }
+#svgtree { 
+  position:relative; 
+  height:100%; 
+  width:100%;
+  border-right: 10px solid #555;
+  }
+
+svg {
+  border-bottom: 10px solid #555;
+}
+
+#treediv {
+}
 
 h3 {
   color: #bbb;
@@ -15,6 +27,12 @@ h3 {
 
 .container {
   display: flex;
+  width: 100%
+  align-items:stretch;
+}
+
+.container div{
+  width: 50%
 }
 
 
