@@ -1,3 +1,7 @@
+	/*
+	Source https://bl.ocks.org/vasturiano/12da9071095fbd4df434e60d52d2d58d
+	Bearbeitet Stellen sind mit deutschen Kommentaren versehen
+	*/
 	rememberText=' ';
         const width = window.innerWidth,
             height = window.innerHeight,
@@ -74,7 +78,7 @@
 
         const svg = d3.select('body').append('svg')
             .style('width', '100vw')
-            .style('height', '100vh')
+            .style('height', '50vh')
             .attr('viewBox', `${-width / 2} ${-height / 2} ${width} ${height}`)
             .on('click', () => focusOn()); // Reset zoom on canvas click
 
@@ -91,7 +95,7 @@
 
             const newSlice = slice.enter()
                 .append('g').attr('class', 'slice')
-				.attr('name', d => d.data.name)
+				.attr('id', d => d.data.name)
                 .on('click', d => {
                     d3.event.stopPropagation();
                     focusOn(d);
@@ -145,27 +149,26 @@
                 .text(d => d.data.name);
         });
 		/*
-		Ausgabe der Discription und des Values (alle Knoten des Astes/Bursts inc. den Ausgewaehlten/Root)
+		Ausgabe der Discription und des Values (alle Knoten des Astes/Bursts ink. den Ausgewaehlten/Root)
 		*/
 		function infoOnDemand(d){
-			i= svg.select('g[name="'+rememberText+'"]').select('.hidden-arc-outer').attr('id');
-				svg.select('g[name="'+rememberText+'"]')
+			i= svg.select('g[id="'+rememberText+'"]').select('.hidden-arc-outer').attr('id');
+				svg.select('g[id="'+rememberText+'"]')
 					.selectAll('textPath').attr('xlink:href', "#"+i  )
-               .text(d.data.description +'\n'+ d.value);
+               .text(d.data.description +"             Value: "+ d.value);
 		}
 		/* 
-		Die Zurücksetzen-funktion für den Nodenamen
+		Die Zurücksetzen-Funktion für den Nodenamen
 		*/
 		function hideInfo(d){
-			i= svg.select('g[name="'+rememberText+'"]').select('.hidden-arc').attr('id');
-				svg.select('g[name="'+rememberText+'"]')
+			i= svg.select('g[id="'+rememberText+'"]').select('.hidden-arc').attr('id');
+				svg.select('g[id="'+rememberText+'"]')
 					.selectAll('textPath').attr('xlink:href', "#"+i  )
                .text(' ');
 		}
 
         function focusOn(d = { x0: 0, x1: 1, y0: 0, y1: 1 , data: 0}) {
             // Reset to top-level if no data point specified
-		//	console.log(d);
 	
             const transition = svg.transition()
                 .duration(750)
@@ -189,7 +192,7 @@
             moveStackToFront(d);
 
 		/*
-			zurücksetzten der Ausgabe Position für den Namen
+			Zurücksetzten der Ausgabe Position für den Namen
 		
 		
 		*/
@@ -202,26 +205,26 @@
 				
 				if(d.depth = 0){
 					
-					svg.select('g[name="'+rememberText+'"]')
+					svg.select('g[id="'+rememberText+'"]')
 					.selectAll('textPath').text(rememberText);
 				}
 					else
 					{
 						if(rememberText != ''){
-						svg.select('g[name="'+rememberText+'"]')
+						svg.select('g[id="'+rememberText+'"]')
 						.selectAll('textPath').text(rememberText);
 						}
 						
 					
-					rememberText=svg.select('g[name="'+d.data.name+'"]')
+					rememberText=svg.select('g[id="'+d.data.name+'"]')
 					.selectAll('textPath').text();
-					svg.select('g[name="'+d.data.name+'"]')
+					svg.select('g[id="'+d.data.name+'"]')
 					.selectAll('textPath').text('');
 					}
 				}
 				else{
 	
-					svg.select('g[name="'+rememberText+'"]')
+					svg.select('g[id="'+rememberText+'"]')
 					.selectAll('textPath').text(rememberText);
 				
 				
