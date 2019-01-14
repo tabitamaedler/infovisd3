@@ -3,6 +3,7 @@
 // chair of the TU Dresden. Do not distribute in modified or unmodified form! 
 // Copyright (C) 2018 CGV TU Dresden - All Rights Reserved
 //
+//Edited from Tabita Mädler & Paul Riedel
 
 #include <vtkAutoInit.h>
 VTK_MODULE_INIT(vtkRenderingOpenGL2);
@@ -16,14 +17,6 @@ VTK_MODULE_INIT(vtkRenderingFreeType);
 #include <vtkImageGradientMagnitude.h>
 #include <vtkWarpScalar.h>
 #include <vtkDataSetMapper.h>
-#include <vtkPolyData.h>
-#include <vtkPointData.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkImageData.h>
-#include <vtkDoubleArray.h>
-#include <vtkCellData.h>
-#include <vtkImageDataGeometryFilter.h>
-#include <vtkVolumeProperty.h>
 
 #include <vtkActor.h>
 #include <vtkProperty.h>
@@ -167,7 +160,7 @@ int main(int argc, char * argv[])
 
 
 	vtkSmartPointer<vtkWarpScalar> warpFilter = vtkSmartPointer<vtkWarpScalar>::New();
-	warpFilter->SetInputData(source->GetOutput());
+	warpFilter->SetInputConnection(source->GetOutputPort());
 	warpFilter->SetScaleFactor(2);
 
 	warpFilter->Update();
